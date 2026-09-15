@@ -1,0 +1,2 @@
+Model,Threshold,Accuracy,Precision,Recall,F1 Score,ROC-AUC,PR-AUC,True Negatives,False Positives,False Negatives,True Positives
+Tuned HistGradientBoosting,0.1,0.977755,0.19044990339497653,0.31278331822302813,0.23674729799279465,0.8961277913518476,0.16978518310375695,194861,2933,1516,690

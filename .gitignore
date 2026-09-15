@@ -1,0 +1,7 @@
+node_modules/
+dashboard/frontend/node_modules/
+dashboard/frontend/dist/
+dashboard/frontend/.env
+data/raw/
+__pycache__/
+*.pyc
