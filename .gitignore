@@ -1,4 +1,5 @@
 node_modules/
+fraud_detection.db
 dashboard/frontend/node_modules/
 dashboard/frontend/dist/
 dashboard/frontend/.env
