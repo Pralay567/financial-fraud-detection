@@ -5,22 +5,34 @@ from pathlib import Path
 from pydantic import BaseModel
 import pandas as pd
 import numpy as np
+import os
 
 
 app = FastAPI(title="Financial Fraud Detection API")
 
+
+# CORS configuration
+frontend_url = os.getenv("FRONTEND_URL")
+
+allowed_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+if frontend_url:
+    allowed_origins.append(frontend_url)
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+# Model path
 MODEL_PATH = (
     Path(__file__).resolve().parent.parent
     / "fraud_detection_model_bundle.joblib"
