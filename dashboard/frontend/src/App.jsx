@@ -3,6 +3,7 @@ import { useState } from 'react'
 import {
   BarChart,
   Bar,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -60,33 +61,38 @@ function App() {
   })
 
   const handlePredict = async () => {
-  setLoading(true)
-  setError('')
-  setPrediction(null)
+    setLoading(true)
+    setError('')
+    setPrediction(null)
 
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/predict`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    })
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/predict`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }
+      )
 
-    if (!response.ok) {
-      throw new Error('Prediction request failed')
+      if (!response.ok) {
+        throw new Error('Prediction request failed')
+      }
+
+      const data = await response.json()
+
+      setPrediction(data)
+    } catch (error) {
+      console.error('Prediction Error:', error)
+      setError(
+        'Unable to connect to the fraud detection API. Please make sure the backend is running.'
+      )
+    } finally {
+      setLoading(false)
     }
-
-    const data = await response.json()
-
-    setPrediction(data)
-  } catch (error) {
-    console.error('Prediction Error:', error)
-    setError('Unable to connect to the fraud detection API. Please make sure the backend is running.')
-  } finally {
-    setLoading(false)
   }
-}
 
   const handleInputChange = (event) => {
     const { name, value } = event.target
@@ -173,6 +179,8 @@ function App() {
                 <YAxis
                   dataKey="level"
                   type="category"
+                  width="auto"
+                  tickMargin={8}
                 />
 
                 <Tooltip
@@ -183,6 +191,19 @@ function App() {
                 />
 
                 <Bar dataKey="transactions">
+
+                  {riskData.map((entry) => (
+                    <Cell
+                      key={`cell-${entry.level}`}
+                      fill={
+                        entry.level === 'Low'
+                          ? '#22c55e'
+                          : entry.level === 'Medium'
+                          ? '#f59e0b'
+                          : '#ef4444'
+                      }
+                    />
+                  ))}
 
                   <LabelList
                     dataKey="transactions"
@@ -656,7 +677,8 @@ function App() {
             <div className="error-message">
               {error}
             </div>
-        )}    
+          )}
+
           {prediction && (
             <div
               className={`prediction-result risk-${prediction.risk_level.toLowerCase()}`}
@@ -681,11 +703,21 @@ function App() {
               <p>
                 Risk Level:{' '}
 
-                <strong
-                  className={`risk-level risk-${prediction.risk_level.toLowerCase()}`}
-                >
-                  {prediction.risk_level}
-                </strong>
+<strong
+  className={`risk-level risk-${prediction.risk_level.toLowerCase()}`}
+  style={{
+    color:
+      prediction.risk_level === 'Low'
+        ? '#22c55e'
+        : prediction.risk_level === 'Medium'
+        ? '#f59e0b'
+        : prediction.risk_level === 'High'
+        ? '#ef4444'
+        : '#d61919',
+  }}
+>
+  {prediction.risk_level}
+</strong>
               </p>
 
               <p>
@@ -745,6 +777,47 @@ function App() {
           </p>
 
         </section>
+
+        {/* Dashboard Footer */}
+        <footer
+          style={{
+            width: '100%',
+            maxWidth: 'none',
+            boxSizing: 'border-box',
+            textAlign: 'center',
+            padding: '24px 20px',
+            marginTop: '10px',
+          }}
+        >
+          <strong>Financial Fraud Detection</strong>
+
+          <span
+            style={{
+              display: 'block',
+              marginTop: '6px',
+            }}
+          >
+            AI-Powered Fraud Detection System
+          </span>
+
+          <span
+            style={{
+              display: 'block',
+              marginTop: '4px',
+            }}
+          >
+            v1.0.0
+          </span>
+
+          <span
+            style={{
+              display: 'block',
+              marginTop: '4px',
+            }}
+          >
+            Made by Pralay Bajkhan
+          </span>
+        </footer>
 
       </main>
 
