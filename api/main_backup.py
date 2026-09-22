@@ -16,7 +16,7 @@ from email.mime.text import MIMEText
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MODEL_PATH = BASE_DIR / "models" / "fraud_detection_random_forest_pipeline.joblib"
+MODEL_PATH = BASE_DIR / "fraud_detection_model_bundle.joblib"
 OCSVM_PATH = BASE_DIR / "ocsvm_model_bundle.joblib"
 
 
@@ -66,9 +66,15 @@ ocsvm_features = ocsvm_bundle["features"]
 # Load Supervised Fraud Detection Model
 # ============================================================
 
-model = joblib.load(MODEL_PATH)
+model_bundle = joblib.load(MODEL_PATH)
 
-print("Supervised model loaded:", type(model).__name__)
+model = model_bundle["model"]
+encoder = model_bundle["encoder"]
+threshold = model_bundle["threshold"]
+
+categorical_features = model_bundle["categorical_features"]
+numerical_features = model_bundle["numerical_features"]
+
 
 # ============================================================
 # Email Alert Configuration
@@ -270,6 +276,15 @@ def predict(transaction: TransactionInput):
     input_df = pd.DataFrame([data])
 
 
+    # --------------------------------------------------------
+    # Remove constant feature used during supervised training
+    # --------------------------------------------------------
+
+    input_df = input_df.drop(
+        columns=["device_fraud_count"]
+    )
+
+
     # ========================================================
     # One-Class SVM Anomaly Detection
     # ========================================================
@@ -306,12 +321,30 @@ def predict(transaction: TransactionInput):
     # Supervised Fraud Detection
     # ========================================================
 
-    # The Random Forest pipeline contains its own
-    # preprocessing and classification steps.
+    # Encode categorical features
+    encoded = encoder.transform(
+        input_df[categorical_features]
+    )
+
+    # Select numerical features
+    numerical = input_df[
+        numerical_features
+    ].to_numpy()
+
+    # Combine numerical and encoded features
+    processed = np.hstack([
+        numerical,
+        encoded
+    ])
+
+
+    # --------------------------------------------------------
+    # Generate fraud probability
+    # --------------------------------------------------------
 
     fraud_probability = model.predict_proba(
-        input_df
-    )[0, 1]
+        processed
+    )[:, 1][0]
 
 
     # --------------------------------------------------------
@@ -346,7 +379,7 @@ def predict(transaction: TransactionInput):
     # Apply selected decision threshold
     # --------------------------------------------------------
 
-    predicted_fraud = fraud_probability >= 0.5
+    predicted_fraud = fraud_probability >= threshold
 
 
     # ========================================================

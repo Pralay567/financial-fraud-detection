@@ -11,6 +11,7 @@ body {
 
 .dashboard {
   min-height: 100vh;
+  min-width: 1200px;
 }
 
 .dashboard-header {
@@ -52,7 +53,7 @@ body {
 
 .dashboard-content {
   padding: 32px 40px;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: auto;
 }
 

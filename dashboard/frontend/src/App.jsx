@@ -703,21 +703,21 @@ function App() {
               <p>
                 Risk Level:{' '}
 
-<strong
-  className={`risk-level risk-${prediction.risk_level.toLowerCase()}`}
-  style={{
-    color:
-      prediction.risk_level === 'Low'
-        ? '#22c55e'
-        : prediction.risk_level === 'Medium'
-        ? '#f59e0b'
-        : prediction.risk_level === 'High'
-        ? '#ef4444'
-        : '#d61919',
-  }}
->
-  {prediction.risk_level}
-</strong>
+                <strong
+                  className={`risk-level risk-${prediction.risk_level.toLowerCase()}`}
+                  style={{
+                    color:
+                      prediction.risk_level === 'Low'
+                        ? '#22c55e'
+                        : prediction.risk_level === 'Medium'
+                        ? '#f59e0b'
+                        : prediction.risk_level === 'High'
+                        ? '#ef4444'
+                        : '#d61919',
+                  }}
+                >
+                  {prediction.risk_level}
+                </strong>
               </p>
 
               <p>
@@ -727,6 +727,31 @@ function App() {
                   {prediction.predicted_fraud
                     ? 'Yes'
                     : 'No'}
+                </strong>
+              </p>
+
+              {/* One-Class SVM Anomaly Detection */}
+              <p>
+                Anomaly Detection:{' '}
+
+                <strong
+                  style={{
+                    color: prediction.anomaly_detected
+                      ? '#ef4444'
+                      : '#22c55e',
+                  }}
+                >
+                  {prediction.anomaly_detected
+                    ? 'Anomaly Detected'
+                    : 'Normal'}
+                </strong>
+              </p>
+
+              <p>
+                Detection Method:{' '}
+
+                <strong>
+                  {prediction.anomaly_method}
                 </strong>
               </p>
 
